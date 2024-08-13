@@ -1,0 +1,5 @@
+.event-card-img {
+  height: 350px;
+  object-fit: cover; 
+  width: 100%; 
+}
