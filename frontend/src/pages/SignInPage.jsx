@@ -1,4 +1,3 @@
-// SignInPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,8 +32,9 @@ const SignInPage = () => {
       const data = await response.json();
       if (response.ok) {
         setMessage(data.message || 'Connexion réussie');
-        signin(data.key, data.is_admin); // Utilisez les données reçues pour signer l'utilisateur
-        navigate('/'); // Redirigez l'utilisateur vers la page d'accueil
+        localStorage.setItem('token', data.token); // Stocke le token dans le local storage
+        signin(data.token); // Passe le token au contexte d'authentification
+        navigate('/'); // Redirige vers la page d'accueil
       } else {
         setMessage(data.message || 'Erreur lors de la connexion. Veuillez réessayer.');
       }

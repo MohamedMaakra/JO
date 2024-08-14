@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AuthContext } from '../contexts/AuthContext'; 
+import { useAuth } from '../contexts/AuthContext'; 
 import { CartContext } from '../contexts/CartContext'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Header = () => {
-  const { auth, signout } = useContext(AuthContext);
+  const { token, isAuthenticated, signout } = useAuth(); 
   const { clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
@@ -27,12 +27,12 @@ const Header = () => {
             <NavLink className="nav-link text-white" to="/offers">Offres</NavLink>
           </li>
 
-          {auth.isAdmin && (
+          {isAuthenticated && (
             <li className="nav-item">
               <NavLink className="nav-link text-white" to="/admin">Admin</NavLink>
             </li>
           )}
-          {!auth.key ? (
+          {!token ? (
             <>
               <li className="nav-item">
                 <NavLink className="nav-link text-white" to="/signin">Connexion</NavLink>
