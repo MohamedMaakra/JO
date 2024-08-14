@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+// Utilisez l'URL de l'API depuis les variables d'environnement
+const API_URL = process.env.REACT_APP_API_URL;
+
 const AddOfferForm = ({ fetchOffers }) => {
   const [formData, setFormData] = useState({
     titre: '',
@@ -22,7 +25,7 @@ const AddOfferForm = ({ fetchOffers }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:5000/api/offers', formData, {
+      const response = await axios.post(`${API_URL}/api/offers`, formData, {
         headers: {
           'Content-Type': 'application/json',
         },
