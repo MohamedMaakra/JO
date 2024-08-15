@@ -1,9 +1,34 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Offer
+from flask_sqlalchemy import SQLAlchemy
 import jwt
 import datetime
+from datetime import timedelta, datetime as dt
+
+# Initialiser l'instance SQLAlchemy
+db = SQLAlchemy()
+
+# Définir le modèle User
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
+    nom = db.Column(db.String(100))
+    prenom = db.Column(db.String(100))
+    key = db.Column(db.String(100))
+    is_admin = db.Column(db.Boolean, default=False)
+    failed_attempts = db.Column(db.Integer, default=0)
+    lockout_time = db.Column(db.DateTime, nullable=True)
+
+# Définir le modèle Offer
+class Offer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titre = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    prix = db.Column(db.Float, nullable=False)
+    details = db.Column(db.Text)
+    nombre_personnes = db.Column(db.Integer, default=1)
 
 def create_app():
     app = Flask(__name__)
@@ -94,18 +119,43 @@ def create_app():
         password = data.get('password')
 
         if not email or not password:
-            return jsonify({"message": "Email et mot de passe sont requis"}), 400
+            return jsonify({"message": "Les champs 'email' et 'password' sont requis"}), 400
 
         user = User.query.filter_by(email=email).first()
+
+        if user and user.lockout_time and user.lockout_time > dt.utcnow():
+            return jsonify({"message": "Compte verrouillé. Réessayez plus tard"}), 403
+
         if user and check_password_hash(user.password, password):
-            token = jwt.encode(
-                {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
-                app.config['SECRET_KEY'],
-                algorithm='HS256'
-            )
-            return jsonify({"message": "Connexion réussie", "token": token}), 200
+            user.failed_attempts = 0
+            user.lockout_time = None
+            db.session.commit()
+
+            # Créer le token JWT avec is_admin
+            token = jwt.encode({
+                'user_id': user.id,
+                'is_admin': user.is_admin,  # Inclure is_admin
+                'exp': dt.utcnow() + timedelta(hours=1)
+            }, app.config['SECRET_KEY'], algorithm='HS256')
+
+            # Ajouter des logs pour le token
+            print("Generated Token:", token)
+            decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            print("Decoded Token:", decoded_token)
+
+            return jsonify({
+                'message': 'Connexion réussie',
+                'token': token,
+                'is_admin': user.is_admin
+            }), 200
         else:
-            return jsonify({"message": "Email ou mot de passe incorrect"}), 401
+            if user:
+                user.failed_attempts += 1
+                if user.failed_attempts >= 5:
+                    user.lockout_time = dt.utcnow() + timedelta(minutes=15)
+                db.session.commit()
+            return jsonify({"message": "Adresse email ou mot de passe incorrect"}), 401
+
 
     return app
 
