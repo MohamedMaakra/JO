@@ -1,9 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
 from models import db
-from routes.offers import offers_bp  # Importer le blueprint des offres
-from routes.cart import cart_bp  # Importer le blueprint du panier
 from routes.auth import auth_bp  # Importer le blueprint d'authentification
+from routes.offers import offers_bp  # Importer le blueprint des offres
 
 def create_app():
     app = Flask(__name__)
@@ -21,9 +20,8 @@ def create_app():
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # Enregistrer les blueprints
+    app.register_blueprint(auth_bp)  # Enregistrement du blueprint d'authentification
     app.register_blueprint(offers_bp)
-    app.register_blueprint(cart_bp)
-    app.register_blueprint(auth_bp)
 
     return app
 
