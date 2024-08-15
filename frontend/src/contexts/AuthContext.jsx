@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import {jwtDecode }from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 const AuthContext = createContext();
 
@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
   const signin = (token, isAdmin) => {
     localStorage.setItem('token', token);
     localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
-    console.log('Stored isAdmin in localStorage:', JSON.stringify(isAdmin)); // Log pour vérification
     setAuth({
       token,
       isAuthenticated: true,
@@ -55,4 +54,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-export { AuthContext };

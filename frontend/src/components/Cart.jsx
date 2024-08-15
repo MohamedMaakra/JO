@@ -7,16 +7,24 @@ import QRCode from "qrcode.react";
 
 const Cart = () => {
   const { cart, removeFromCart, clearCart } = useContext(CartContext);
-  const { auth } = useAuth();
+  const { token } = useAuth();  // Obtenir le token du contexte d'authentification
   const navigate = useNavigate();
   const [qrCodeValue, setQrCodeValue] = useState(null);
 
   const totalPrice = cart.reduce((total, item) => total + item.prix, 0);
 
   const handleCheckout = async () => {
-    if (!auth.key) {
-      navigate('/signin'); 
-    } else {
+    // Vérifiez la présence du token dans le localStorage
+    const storedToken = localStorage.getItem('token');
+
+    if (!storedToken) {
+      navigate('/signin'); // Rediriger vers la page de connexion si le token est absent
+      return;
+    }
+
+    try {
+      // Optionnel : Vous pouvez également vérifier la validité du token ici, par exemple avec un appel API
+
       // Simuler le paiement
       console.log('Paiement en cours...');
 
@@ -24,12 +32,16 @@ const Cart = () => {
       const newKey = uuidv4();
 
       // Concaténer la nouvelle clé avec la clé existante de l'utilisateur
-      const finalKey = auth.key + newKey;
+      const finalKey = storedToken + newKey;
 
       // Générer le QR Code
       setQrCodeValue(finalKey);
-     
+
+      // Vider le panier
       clearCart();
+    } catch (error) {
+      console.error('Erreur lors du traitement du paiement:', error);
+      navigate('/signin'); // Rediriger en cas d'erreur
     }
   };
 

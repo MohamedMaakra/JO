@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AuthContext } from '../contexts/AuthContext';  // Assurez-vous que ce chemin est correct
+import { useAuth } from '../contexts/AuthContext'; // Importer `useAuth` au lieu de `AuthContext`
 import { CartContext } from '../contexts/CartContext'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Header = () => {
-  const { token, isAdmin, signout } = useContext(AuthContext);
+  const { token, isAdmin, signout } = useAuth(); // Utiliser `useAuth` pour obtenir les valeurs
   const { clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
