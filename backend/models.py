@@ -13,6 +13,9 @@ class User(db.Model):
     failed_attempts = db.Column(db.Integer, default=0)
     lockout_time = db.Column(db.DateTime, nullable=True)
 
+    # Relation avec le panier
+    cart_items = db.relationship('Cart', backref='user', lazy=True)
+
 class Offer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titre = db.Column(db.String(255), nullable=False)
@@ -20,3 +23,13 @@ class Offer(db.Model):
     prix = db.Column(db.Float, nullable=False)
     details = db.Column(db.Text, nullable=True)
     nombre_personnes = db.Column(db.Integer, default=1)
+
+    # Relation avec le panier
+    cart_items = db.relationship('Cart', backref='offer', lazy=True)
+
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    offer_id = db.Column(db.Integer, db.ForeignKey('offer.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    quantity = db.Column(db.Integer, default=1)
+    date_added = db.Column(db.DateTime, default=db.func.current_timestamp())
