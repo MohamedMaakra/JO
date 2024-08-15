@@ -33,7 +33,7 @@ const SignInPage = () => {
       if (response.ok) {
         setMessage(data.message || 'Connexion réussie');
         localStorage.setItem('token', data.token); // Stocke le token dans le local storage
-        signin(data.token); // Passe le token au contexte d'authentification
+        signin(data.token, data.is_admin); // Passe le token et is_admin au contexte d'authentification
         navigate('/'); // Redirige vers la page d'accueil
       } else {
         setMessage(data.message || 'Erreur lors de la connexion. Veuillez réessayer.');
