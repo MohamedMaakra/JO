@@ -1,10 +1,9 @@
-# routes/offers.py
+from flask import Blueprint, request, jsonify
+from models import db, Offer
 
-from flask import Blueprint, request, jsonify, current_app
+offers_bp = Blueprint('offers', __name__)
 
-bp = Blueprint('offers', __name__)
-    
-@bp.route('/api/offers', methods=['POST'])
+@offers_bp.route('/api/offers', methods=['POST'])
 def create_offer():
     data = request.get_json()
     titre = data.get('titre')
@@ -17,35 +16,73 @@ def create_offer():
         return jsonify({"message": "Les champs 'titre' et 'prix' sont requis"}), 400
 
     try:
-        db = current_app.extensions['sqlalchemy'].db
-        cursor = db.session.execute(
-            'INSERT INTO offer (titre, description, prix, details, nombre_personnes) VALUES (:titre, :description, :prix, :details, :nombre_personnes)',
-            {'titre': titre, 'description': description, 'prix': prix, 'details': details, 'nombre_personnes': nombre_personnes}
-        )
+        new_offer = Offer(titre=titre, description=description, prix=prix, details=details, nombre_personnes=nombre_personnes)
+        db.session.add(new_offer)
         db.session.commit()
         return jsonify({"message": "Nouvelle offre créée avec succès"}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@bp.route('/api/offers', methods=['GET'])
+@offers_bp.route('/api/offers', methods=['GET'])
 def get_offers():
     try:
-        db = current_app.extensions['sqlalchemy'].db
-        offers = db.session.execute('SELECT * FROM offer').fetchall()
-
-        # Formatter les résultats pour une meilleure lisibilité
+        offers = Offer.query.all()
         offers_list = [
             {
-                'id': offer[0],  # Assure-toi que les indices correspondent aux colonnes
-                'titre': offer[1],
-                'description': offer[2],
-                'prix': offer[3],
-                'details': offer[4],
-                'nombre_personnes': offer[5]
+                'id': offer.id,
+                'titre': offer.titre,
+                'description': offer.description,
+                'prix': offer.prix,
+                'details': offer.details,
+                'nombre_personnes': offer.nombre_personnes
             }
             for offer in offers
         ]
-
         return jsonify(offers_list), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@offers_bp.route('/api/offers/<int:offer_id>', methods=['PUT'])
+def update_offer(offer_id):
+    data = request.get_json()
+    titre = data.get('titre')
+    description = data.get('description')
+    prix = data.get('prix')
+    details = data.get('details')
+    nombre_personnes = data.get('nombre_personnes', 1)  # Nombre de personnes par défaut
+
+    offer = Offer.query.get(offer_id)
+
+    if not offer:
+        return jsonify({"message": "Offre non trouvée"}), 404
+
+    if titre:
+        offer.titre = titre
+    if description:
+        offer.description = description
+    if prix is not None:
+        offer.prix = prix
+    if details:
+        offer.details = details
+    if nombre_personnes is not None:
+        offer.nombre_personnes = nombre_personnes
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Offre mise à jour avec succès"}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@offers_bp.route('/api/offers/<int:offer_id>', methods=['DELETE'])
+def delete_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+
+    if not offer:
+        return jsonify({"message": "Offre non trouvée"}), 404
+
+    try:
+        db.session.delete(offer)
+        db.session.commit()
+        return jsonify({"message": "Offre supprimée avec succès"}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
