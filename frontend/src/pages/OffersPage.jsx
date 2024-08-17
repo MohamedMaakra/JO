@@ -12,10 +12,13 @@ const OfferPage = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
+        // Vérification de l'URL API
         if (!API_URL) {
           throw new Error('API_URL is not defined');
         }
+        console.log(`API URL: ${API_URL}`);
         console.log(`Fetching offers from ${API_URL}/api/offers`);
+
         const response = await axios.get(`${API_URL}/api/offers`);
         console.log("Données reçues : ", response.data);
         setOffers(response.data);
