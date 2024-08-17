@@ -3,7 +3,7 @@ from models import db, Offer
 
 offers_bp = Blueprint('offers', __name__)
 
-@offers_bp.route('/api/offers', methods=['POST'])
+@offers_bp.route('/', methods=['POST'])
 def create_offer():
     data = request.get_json()
     titre = data.get('titre')
@@ -23,7 +23,7 @@ def create_offer():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@offers_bp.route('/api/offers', methods=['GET'])
+@offers_bp.route('/', methods=['GET'])
 def get_offers():
     try:
         offers = Offer.query.all()
@@ -42,7 +42,7 @@ def get_offers():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@offers_bp.route('/api/offers/<int:offer_id>', methods=['PUT'])
+@offers_bp.route('/<int:offer_id>', methods=['PUT'])
 def update_offer(offer_id):
     data = request.get_json()
     titre = data.get('titre')
@@ -73,7 +73,7 @@ def update_offer(offer_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@offers_bp.route('/api/offers/<int:offer_id>', methods=['DELETE'])
+@offers_bp.route('/<int:offer_id>', methods=['DELETE'])
 def delete_offer(offer_id):
     offer = Offer.query.get(offer_id)
 
