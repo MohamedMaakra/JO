@@ -20,7 +20,10 @@ const AdminOffersPage = () => {
 
   const fetchOffers = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/offers');
+      const response = await fetch('https://jo-backend-203b837e3ff8.herokuapp.com/api/offers');
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
       setOffers(data);
     } catch (error) {
@@ -39,9 +42,8 @@ const AdminOffersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = editMode ? 'PUT' : 'POST';
-    const url = editMode ? `http://127.0.0.1:5000/api/offers/${selectedOfferId}` : 'http://127.0.0.1:5000/api/offers';
+    const url = editMode ? `https://jo-backend-203b837e3ff8.herokuapp.com/api/offers/${selectedOfferId}` : 'https://jo-backend-203b837e3ff8.herokuapp.com/api/offers';
 
-    // Validation des champs requis
     if (!formData.titre || !formData.description || !formData.prix) {
       setMessage('Veuillez remplir tous les champs requis.');
       return;
@@ -55,11 +57,16 @@ const AdminOffersPage = () => {
         },
         body: JSON.stringify(formData),
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur ${response.status}: ${errorText}`);
+      }
+
       const data = await response.json();
-      setMessage(data.message);
+      setMessage(data.message || 'Opération réussie');
 
       if (response.ok) {
-        // Réinitialiser le formulaire seulement si la soumission est réussie
         setFormData({
           titre: '',
           description: '',
@@ -73,7 +80,7 @@ const AdminOffersPage = () => {
       }
     } catch (error) {
       console.error('Erreur lors de l\'envoi du formulaire:', error);
-      setMessage('Erreur lors de l\'envoi du formulaire. Veuillez réessayer.');
+      setMessage(`Erreur lors de l'envoi du formulaire: ${error.message}`);
     }
   };
 
@@ -91,9 +98,12 @@ const AdminOffersPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://127.0.0.1:5000/api/offers/${id}`, {
+      const response = await fetch(`https://jo-backend-203b837e3ff8.herokuapp.com/api/offers/${id}`, {
         method: 'DELETE',
       });
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      }
       fetchOffers();
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'offre:', error);

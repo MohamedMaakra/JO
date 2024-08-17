@@ -35,7 +35,8 @@ const SignUpPage = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/signup', {
+      // Utilisation de la variable d'environnement pour l'URL
+      const response = await axios.post(`${process.env.REACT_APP_API_UR}/api/auth/signup`, {  
         prenom,
         nom,
         email,
