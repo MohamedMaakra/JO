@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/OfferPages.css';
 import { CartContext } from '../contexts/CartContext';
@@ -7,6 +6,7 @@ import { CartContext } from '../contexts/CartContext';
 const OfferPage = () => {
   const { addToCart } = useContext(CartContext);
   const [offers, setOffers] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -15,23 +15,27 @@ const OfferPage = () => {
         if (!apiUrl) {
           throw new Error('API_URL is not defined');
         }
-        console.log(`API URL: ${apiUrl}`);
         console.log(`Fetching offers from ${apiUrl}/api/offers`);
 
-        const response = await axios.get(`${apiUrl}/api/offers`);
-        console.log("Données reçues : ", response.data);
-        setOffers(response.data);
+        const response = await fetch(`${apiUrl}/api/offers`);
+        if (!response.ok) {
+          throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setOffers(data);
       } catch (error) {
         console.error('Erreur lors de la récupération des offres :', error);
+        setErrorMessage('Erreur lors de la récupération des offres. Veuillez réessayer.');
       }
     };
 
-    fetchOffers(); 
+    fetchOffers();
   }, [apiUrl]);
 
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">Nos Offres</h2>
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <div className="row">
         {offers.length > 0 ? (
           offers.map((offer, index) => (
