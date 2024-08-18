@@ -14,13 +14,15 @@ const AdminOffersPage = () => {
   const [selectedOfferId, setSelectedOfferId] = useState(null);
   const [message, setMessage] = useState('');
 
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     fetchOffers();
   }, []);
 
   const fetchOffers = async () => {
     try {
-      const response = await fetch('https://jo-backend-203b837e3ff8.herokuapp.com/api/offers');
+      const response = await fetch(`${apiUrl}/api/offers`);
       if (!response.ok) {
         throw new Error(`Erreur ${response.status}: ${response.statusText}`);
       }
@@ -42,7 +44,9 @@ const AdminOffersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = editMode ? 'PUT' : 'POST';
-    const url = editMode ? `https://jo-backend-203b837e3ff8.herokuapp.com/api/offers/${selectedOfferId}` : 'https://jo-backend-203b837e3ff8.herokuapp.com/api/offers';
+    const url = editMode
+      ? `${apiUrl}/api/offers/${selectedOfferId}`
+      : `${apiUrl}/api/offers`;
 
     if (!formData.titre || !formData.description || !formData.prix) {
       setMessage('Veuillez remplir tous les champs requis.');
@@ -98,7 +102,7 @@ const AdminOffersPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`https://jo-backend-203b837e3ff8.herokuapp.com/api/offers/${id}`, {
+      const response = await fetch(`${apiUrl}/api/offers/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

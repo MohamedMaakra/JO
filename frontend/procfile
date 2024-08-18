@@ -1,1 +1,2 @@
 web: serve -s build
+web: bin/heroku-ssl --port $PORT
