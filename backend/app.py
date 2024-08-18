@@ -1,15 +1,23 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
 from flask_cors import CORS
 from models import db
 from routes.auth import auth_bp
 from routes.offers import offers_bp
 import os
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 def create_app():
     load_dotenv()  # Charger les variables d'environnement depuis .env
 
     app = Flask(__name__)
+
+    # Enforcer HTTPS redirection
+    @app.before_request
+    def enforce_https():
+        if not request.is_secure and request.url.startswith("http://"):
+            url = request.url.replace("http://", "https://", 1)
+            return redirect(url, code=301)
 
     # Configuration de la base de données
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///local.db')
@@ -44,6 +52,9 @@ def create_app():
     # Enregistrer les blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(offers_bp, url_prefix='/api/offers')
+
+    # Utiliser ProxyFix pour gérer les en-têtes X-Forwarded-Proto
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     return app
 

@@ -19,8 +19,9 @@ def create_offer():
         new_offer = Offer(titre=titre, description=description, prix=prix, details=details, nombre_personnes=nombre_personnes)
         db.session.add(new_offer)
         db.session.commit()
-        return jsonify({"message": "Nouvelle offre créée avec succès"}), 201
+        return jsonify({"message": "Nouvelle offre créée avec succès", "offer": new_offer.id}), 201
     except Exception as e:
+        db.session.rollback()  # Assurez-vous de rollback en cas d'erreur
         return jsonify({'error': str(e)}), 500
 
 @offers_bp.route('/', methods=['GET'])
@@ -71,6 +72,7 @@ def update_offer(offer_id):
         db.session.commit()
         return jsonify({"message": "Offre mise à jour avec succès"}), 200
     except Exception as e:
+        db.session.rollback()  # Assurez-vous de rollback en cas d'erreur
         return jsonify({'error': str(e)}), 500
 
 @offers_bp.route('/<int:offer_id>', methods=['DELETE'])
@@ -85,4 +87,5 @@ def delete_offer(offer_id):
         db.session.commit()
         return jsonify({"message": "Offre supprimée avec succès"}), 200
     except Exception as e:
+        db.session.rollback()  # Assurez-vous de rollback en cas d'erreur
         return jsonify({'error': str(e)}), 500
