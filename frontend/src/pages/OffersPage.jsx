@@ -7,19 +7,18 @@ import { CartContext } from '../contexts/CartContext';
 const OfferPage = () => {
   const { addToCart } = useContext(CartContext);
   const [offers, setOffers] = useState([]);
-  const API_URL = process.env.REACT_APP_API_URL;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        // Vérification de l'URL API
-        if (!API_URL) {
+        if (!apiUrl) {
           throw new Error('API_URL is not defined');
         }
-        console.log(`API URL: ${API_URL}`);
-        console.log(`Fetching offers from ${API_URL}/api/offers`);
+        console.log(`API URL: ${apiUrl}`);
+        console.log(`Fetching offers from ${apiUrl}/api/offers`);
 
-        const response = await axios.get(`${API_URL}/api/offers`);
+        const response = await axios.get(`${apiUrl}/api/offers`);
         console.log("Données reçues : ", response.data);
         setOffers(response.data);
       } catch (error) {
@@ -28,7 +27,7 @@ const OfferPage = () => {
     };
 
     fetchOffers(); 
-  }, [API_URL]);
+  }, [apiUrl]);
 
   return (
     <div className="container mt-5">
