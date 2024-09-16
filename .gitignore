@@ -1,0 +1,41 @@
+# Environnement
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers temporaires
+*~
+.DS_Store
+.coverage
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.pylint.d/
+
+# Builds et distributions
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Logs
+*.log
+
+# Données de test
+*.sqlite
+*.db
+
+# Environnements virtuels
+venv/
+.venv/
+env/
