@@ -15,7 +15,8 @@ def create_app():
     # Enforcer HTTPS redirection
     @app.before_request
     def enforce_https():
-        if not request.is_secure and request.url.startswith("http://"):
+        # Ne pas appliquer la redirection HTTPS en mode test
+        if not app.testing and not request.is_secure and request.url.startswith("http://"):
             url = request.url.replace("http://", "https://", 1)
             return redirect(url, code=301)
 
