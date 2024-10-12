@@ -39,3 +39,7 @@ dist/
 venv/
 .venv/
 env/
+
+
+frontend/.env
+frontend/.env.production
