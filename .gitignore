@@ -43,3 +43,6 @@ env/
 
 frontend/.env
 frontend/.env.production
+backend/.env
+backend/.env.production
+
